@@ -44,17 +44,6 @@ def create_home_frame(mm_window: tkinter.Tk) -> tkinter.ttk.Frame:
 
 	'''
 
-	'''
-	def option_ending_in_5_square_2_digit() -> typing.Tuple(str, int):
-		possible_questions: typing.List = [((q * 10) + 5)) for q in range(1, 10)] 
-
-		question: str = f"{random.choice(possible_questions)} ^ 2"
-		answer: int = question ** 2
-
-		return (question, answer)
-			
-	option_checkbox["ending_in_5_square_2_digit"] = option_ending_in_5_square_2_digit()
-	'''
 
 	return home_frame
 
@@ -66,11 +55,36 @@ def create_question_frame(mm_window: tkinter.Tk) -> tkinter.ttk.Frame:
 	question_frame.grid_rowconfigure(1, weight=1)
 	question_frame.grid_columnconfigure(0, weight=1)
 
+	question_text, question_answer = random.choice(list(available_questions.items()))
+
 	question_text: tkinter.ttk.Text = tkinter.ttk.Text(master=question_frame, wrap="word")
+	question_text.insert("start", question.question)
 	question_text.state(["disabled"])
 
 	answer_text: tkinter.ttk.Text = tkinter.ttk.Text(master=question_frame, wrap="word")
 	answer_text.state(["disabled"])
+
+	answer_frame.bind("<Spacebar>", proceed)
+	answer_frame.bind("<Esc>", go_to_home)
+	
+	'''
+	def proceed():
+		if not proceed.answer_shown:
+			proceed.answer_shown = False		
+		else:
+			if proceed.answer_shown:
+				show_next_question()
+				proceed.answer_shown = False
+			else:
+				show_answer()
+				proceed.answer_shown = True
+				
+
+
+
+
+	'''
+
 
 	return question_frame
 
