@@ -4,7 +4,7 @@ import tkinter
 import tkinter.ttk
 import random
 
-available_question_handlers = {}
+available_question_types = []
 active_question_text = None
 active_question_answer = None
 
@@ -13,11 +13,10 @@ def mm() -> None:
 	home_frame: tkinter.ttk.Frame = create_home_frame(root_window)
 	question_frame: tkinter.ttk.Frame = create_question_frame(root_window)
 
-	run_mm(window, home_frame, question_frame)
+	connect_home_and_question_frames(home_frame, question_frame)
 
-def run_mm():
-	attach_home_frame_event_listeners(home_frame)
 	home_frame.tkraise()
+
 	root_window.mainloop()
 
 def create_root_window(title):
@@ -26,7 +25,6 @@ def create_root_window(title):
 	window.grid_rowconfigure(0, weight=1)
 	window.grid_columnconfigure(0, weight=1)
 	
-
 def create_home_frame(mm_window: tkinter.Tk) -> tkinter.ttk.Frame:
 	home_frame: tkinter.ttk.Frame = tkinter.ttk.Frame(master=mm_window, padx=12, pady=12)
 	home_frame.grid(row=0, column=0, sticky="nsew")
@@ -38,8 +36,8 @@ def create_home_frame(mm_window: tkinter.Tk) -> tkinter.ttk.Frame:
 	home_frame.grid_columnconfigure(0, weight=1)
 	home_frame.grid_columnconfigure(1, weight=1)
 
-	available_question_types = []
-	for question_type in MM_Questions.questions_handlers:
+	global available_question_types
+	for question_type in MM_Questions.question_handlers:
 		available_question_types.push(tkinter.StringVar())
 		checkbox = tkinter.ttk.Checkbox(
 								master=home_frame, 
@@ -51,13 +49,13 @@ def create_home_frame(mm_window: tkinter.Tk) -> tkinter.ttk.Frame:
 		checkbox.state(["!selected"])
 		checkbox.grid
 
-def attach_home_frame_event_listeners():
-	start_btn_event_handler = lambda event: _home_frame_start_questions(available_question_handlers)
-	start_btn: tkinter.ttk.Button = tkinter.ttk.Button(master=home_frame, text="Start", command=when_start_btn)
+	start_btn: tkinter.ttk.Button = tkinter.ttk.Button(master=home_frame, text="Start")
 
-def home_frame_start_event_listener(avaiable_question_handlers) -> None:
-	attach_question_frame_event_listeners(available_question_handlers)
-	question_frame.tkraise()
+def connect_home_and_question_frames(home_frame, question_frame):
+	home_frame.start_btn.configure(command=lambda: question_frame.tkraise())
+
+	go_to_home_event_handler: typing.Callable[[tkinter.Event], None] = lambda event: home_frame.tkraise()
+	answer_frame.bind("<Esc>", go_to_home_event_handler)
 
 def create_question_frame(mm_window: tkinter.Tk) -> tkinter.ttk.Frame:
 	question_frame: tkinter.ttk.Frame = tkinter.ttk.Frame(master=mm_window, padx=12, pady=12)
@@ -80,9 +78,6 @@ def create_question_frame(mm_window: tkinter.Tk) -> tkinter.ttk.Frame:
 
 	proceed_event_handler: typing.Callable[[tkinter.Event], None] = lambda event: _question_frame_event_proceed() 
 	answer_frame.bind("<Spacebar>", proceed_event_handler)
-
-	go_to_home_event_handler: typing.Callable[[tkinter.Event], None] = lambda event: home_frame.tkraise()
-	answer_frame.bind("<Esc>", go_to_home_event_handler)
 	
 	return question_frame
 
@@ -106,7 +101,6 @@ def _question_frame_event_proceed()
 def _question_frame_generate_question():
 	question_type = random.choice(available_question_handlers.keys())
 	return available_question_handlers[question_type]()
-	
 	
 
 if __name__ == "__main__":
