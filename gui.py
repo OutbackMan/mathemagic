@@ -1,6 +1,7 @@
 '''gui.py: Create gui'''
 
 import tkinter
+import tkinter.ttk
 import random
 import typing
 
@@ -53,7 +54,7 @@ def _create_q_and_a_frame(mm_window: tkinter.Tk) -> tkinter.Frame:
 
 
 def _connect_home_and_q_and_a_frames(home_frame: tkinter.Frame, q_and_a_frame: tkinter.Frame) -> None:
-	selected_q_types: typing.List[str] = []
+	q_type_checkbuttons: typing.List[tkinter.ttk.Checkbuttons] = []
 	q_type_indexed_q_and_a_generators: typing.Dict[str, MM_QAndAGenerators.Q_AND_A_GENERATOR_SIGNATURE] = MM_QAndAGenerators.get_q_type_indexed_generators()
 
 	cur_home_frame_checkbutton_row: int = 0
@@ -65,18 +66,18 @@ def _connect_home_and_q_and_a_frames(home_frame: tkinter.Frame, q_and_a_frame: t
 		home_frame.grid_rowconfigure(cur_home_frame_checkbutton_row, weight=1)
 		home_frame.grid_columnconfigure(cur_home_frame_checkbutton_col, weight=1)
 		
-		q_type_checkbutton_var: tkinter.BooleanVar = tkinter.BooleanVar()
-		q_type_checkbutton: tkinter.Checkbutton = tkinter.Checkbutton(
+		q_type_checkbutton: tkinter.ttk.Checkbutton = tkinter.ttk.Checkbutton(
 																master=home_frame, 
 																text=q_type,
-																variable=q_type_checkbutton_var,
-																command=lambda: selected_q_types.append(q_type) if q_type_checkbutton_var.get() else selected_q_types.remove(q_type)
 																)
+		q_type_checkbutton.state(["!alternate"])
 		q_type_checkbutton.grid(
 							row=cur_home_frame_checkbutton_row, 
 							column=cur_home_frame_checkbutton_col, 
 							sticky="nsew"
 							)
+
+		q_type_checkbuttons.append(q_type_checkbutton)
 
 	home_frame_start_btn: tkinter.Button = tkinter.Button(
 													master=home_frame, 
@@ -85,9 +86,9 @@ def _connect_home_and_q_and_a_frames(home_frame: tkinter.Frame, q_and_a_frame: t
 													)
 	home_frame_start_btn.grid(row=cur_home_frame_checkbutton_row + 1, column=0, columnspan=2)
 	
-	(q_and_a_frame_a_textbox, q_and_a_frame_q_textbox) = q_and_a_frame.winfo_children()
+	(q_and_a_frame_q_textbox, q_and_a_frame_a_textbox) = q_and_a_frame.winfo_children()
 
-	show_q_or_a: typing.Callable[[tkinter.Event], None] = lambda event: _show_q_or_a(q_and_a_frame_a_textbox, q_and_a_frame_q_textbox, selected_q_types, q_type_indexed_q_and_a_generators)
+	show_q_or_a: typing.Callable[[tkinter.Event], None] = lambda event: _show_q_or_a(q_and_a_frame_a_textbox, q_and_a_frame_q_textbox, q_type_checkbuttons, q_type_indexed_q_and_a_generators)
 	q_and_a_frame.bind("<space>", show_q_or_a)
 	q_and_a_frame.bind("<Escape>", lambda event: _activate_frame(home_frame)) 
 
@@ -98,11 +99,11 @@ def _activate_frame(frame: tkinter.Frame) -> None:
 def _show_q_or_a(
 			a_textbox: tkinter.Text, 
 			q_textbox: tkinter.Text, 
-			selected_q_types: typing.List[str],
+			q_type_checkbuttons: typing.List[tkinter.ttk.Checkbutton],
 			q_type_indexed_q_and_a_generators: typing.Dict[str, MM_QAndAGenerators.Q_AND_A_GENERATOR_SIGNATURE]
 			) -> None:
 	if "current_q" not in _show_q_or_a.__dict__:
-		(_show_q_or_a.current_q, _show_q_or_a.current_a) = _generate_q_and_a(selected_q_types, q_type_indexed_q_and_a_generators)
+		(_show_q_or_a.current_q, _show_q_or_a.current_a) = _generate_q_and_a(q_type_checkbuttons, q_type_indexed_q_and_a_generators)
 		_show_q_or_a.a_is_shown = False	
 
 	if not _show_q_or_a.a_is_shown:
@@ -112,7 +113,7 @@ def _show_q_or_a(
 		a_textbox.config(state="disabled")	
 		_show_q_or_a.a_is_shown = True
 	else:
-		(_show_q_or_a.current_q, _show_q_or_a.current_a) = _generate_q_and_a(selected_q_types, q_type_indexed_q_and_a_generators)
+		(_show_q_or_a.current_q, _show_q_or_a.current_a) = _generate_q_and_a(q_type_checkbuttons, q_type_indexed_q_and_a_generators)
 
 		q_textbox.config(state="normal")	
 		q_textbox.delete("1.0", "end")
@@ -125,10 +126,13 @@ def _show_q_or_a(
 		
 		_show_q_or_a.a_is_shown = False
 
-def _generate_q_and_a(selected_q_types, q_type_indexed_q_and_a_generators) -> MM_QAndAGenerators.Q_AND_A_SIGNATURE:
+def _generate_q_and_a(q_type_checkbuttons, q_type_indexed_q_and_a_generators) -> MM_QAndAGenerators.Q_AND_A_SIGNATURE:
+	selected_q_types = []
+	for q_type_checkbutton in q_type_checkbuttons:
+		if q_type_checkbutton.instate(["selected"]):
+			selected_q_types.append(q_type_checkbutton.cget("text"))
+
 	selected_q_type = random.choice(selected_q_types)
-	while not selected_q_type:
-		selected_q_type = random.choice(selected_q_types)
 
 	return q_type_indexed_q_and_a_generators[selected_q_type]()
 

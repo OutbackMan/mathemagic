@@ -17,9 +17,10 @@ def _addition_2_digit() -> Q_AND_A_SIGNATURE:
 	return (question, answer)
 
 def get_q_type_indexed_generators() -> typing.Dict[str, Q_AND_A_GENERATOR_SIGNATURE]:
-	q_type_indexed_q_and_a_generators: typing.Dict[str, Q_AND_A_GENERATOR_SIGNATURE] = {
-		"ending in 5 square 2 digit": _ending_in_5_square_2_digit,
-		"addition 2 digit": _addition_2_digit,
-	}
+	q_type_indexed_generators: typing.Dict[str, Q_AND_A_GENERATOR_SIGNATURE] = {}
+	for (identifier, value) in globals().items():
+		if callable(value) and value.__module__ == __name__ and identifier != "get_q_type_indexed_generators":
+			q_type: str = identifier.split("_", 1)[1].replace("_", " ")
+			q_type_indexed_generators[q_type] = value
 
-	return q_type_indexed_q_and_a_generators
+	return q_type_indexed_generators
