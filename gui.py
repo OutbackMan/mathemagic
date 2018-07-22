@@ -45,9 +45,11 @@ def _create_q_and_a_frame(mm_window: tkinter.Tk) -> tkinter.Frame:
 	q_and_a_frame.grid_columnconfigure(0, weight=1)
 
 	q_text_box: tkinter.Text = tkinter.Text(master=q_and_a_frame, wrap="word", state="disabled")
+	q_text_box.tag_configure("center", justify="center")
 	q_text_box.grid(row=0, column=0, sticky="nsew")
 
 	a_text_box: tkinter.Text = tkinter.Text(master=q_and_a_frame, wrap="word", state="disabled")
+	a_text_box.tag_configure("center", justify="center")
 	a_text_box.grid(row=1, column=0, sticky="nsew")
 	
 	return q_and_a_frame
@@ -109,7 +111,7 @@ def _show_q_or_a(
 	if not _show_q_or_a.a_is_shown:
 		a_textbox.config(state="normal")	
 		a_textbox.delete("1.0", "end")
-		a_textbox.insert("1.0", str(_show_q_or_a.current_a))
+		a_textbox.insert("1.0", str(_show_q_or_a.current_a), "center")
 		a_textbox.config(state="disabled")	
 		_show_q_or_a.a_is_shown = True
 	else:
@@ -117,7 +119,7 @@ def _show_q_or_a(
 
 		q_textbox.config(state="normal")	
 		q_textbox.delete("1.0", "end")
-		q_textbox.insert("1.0", _show_q_or_a.current_q)
+		q_textbox.insert("1.0", _show_q_or_a.current_q, "center")
 		q_textbox.config(state="disabled")	
 
 		a_textbox.config(state="normal")	
