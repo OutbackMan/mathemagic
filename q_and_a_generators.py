@@ -67,6 +67,20 @@ def _subtraction_4_digit() -> Q_AND_A_SIGNATURE:
     answer: float = float(eval(question))
     return (question, answer)
 
+def _multiplication_2_and_1_digit() -> Q_AND_A_SIGNATURE:
+    possible_first: typing.List = range(10, 100)
+    possible_second: typing.List = range(1, 10)
+    question: str = f"{random.choice(possible_first)} * {random.choice(possible_second)}"
+    answer: float = float(eval(question))
+    return (question, answer)
+
+def _multiplication_3_and_1_digit() -> Q_AND_A_SIGNATURE:
+    possible_first: typing.List = range(100, 1000)
+    possible_second: typing.List = range(1, 10)
+    question: str = f"{random.choice(possible_first)} * {random.choice(possible_second)}"
+    answer: float = float(eval(question))
+    return (question, answer)
+
 def get_q_type_indexed_generators() -> typing.Dict[str, Q_AND_A_GENERATOR_SIGNATURE]:
 	q_type_indexed_generators: typing.Dict[str, Q_AND_A_GENERATOR_SIGNATURE] = {}
 	for (identifier, value) in globals().items():
