@@ -81,6 +81,13 @@ def _multiplication_3_and_1_digit() -> Q_AND_A_SIGNATURE:
     answer: float = float(eval(question))
     return (question, answer)
 
+def _square_2_digit() -> Q_AND_A_SIGNATURE:
+    possible_first: typing.List = range(10, 100)
+    value: int = random.choice(possible_first)
+    question: str = f"{value} * {value}"
+    answer: float = float(eval(question))
+    return (question, answer)
+
 def get_q_type_indexed_generators() -> typing.Dict[str, Q_AND_A_GENERATOR_SIGNATURE]:
 	q_type_indexed_generators: typing.Dict[str, Q_AND_A_GENERATOR_SIGNATURE] = {}
 	for (identifier, value) in globals().items():
